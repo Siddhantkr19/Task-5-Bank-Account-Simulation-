@@ -1,14 +1,12 @@
-import java.lang.reflect.Array;
 import java .util.*;
 public class BankAccountSimulation {
     public static void showMenu(){
         System.out.println("1. Create Account");
         System.out.println("2. Deposit Money");
         System.out.println("3. Withdraw Money");
-        System.out.println("4 :Apply for laon");
-        System.out.println("5 : Cheak Balance");
-        System.out.println(" 6 :see all user");
-        System.out.println(" 7 : Exit");
+        System.out.println("4 : Cheak Balance");
+        System.out.println(" 5 :see all user");
+        System.out.println(" 6 : Exit");
     }
 
  public static void main(String[] args) {
@@ -35,7 +33,20 @@ public class BankAccountSimulation {
                     String depositerAccountNumber = scanner.nextLine();
                     depositMoney(depositerAccountNumber , scanner , bank);
                     break ;
-                    case 6 :
+                    case 3  :
+                        System.out.println("withdrawal money ");
+                        System.out.println("Enter your Account number ");
+                    String withdrawAccountNumber = scanner.nextLine();
+                    withdrawAccountNumber(withdrawAccountNumber , scanner , bank);
+                    break ;
+                    case 4 :
+                    System.out.println(" Cheak Balance ");
+                    System.out.println(" Enter your Account Number ");
+                    String cheakAccountNumber = scanner.nextLine();
+                    cheakBalance( cheakAccountNumber,bank , scanner);
+                    break ;
+
+                    case 5 :
                     System.out.println(" List of all users:");
                     ArrayList<User> users = Bank.getUser();
                     if (users.isEmpty()) {
@@ -47,7 +58,7 @@ public class BankAccountSimulation {
                        
                     }
                       break ;
-                    case 7 :
+                    case 6 :
                         System.out.println("Thanks for coming ");
                         break;
                          default :
@@ -60,6 +71,49 @@ public class BankAccountSimulation {
        
 
  }   
+
+public static void cheakBalance(String accountNumber , Bank bank , Scanner scanner){
+    boolean found = false ;
+    for(User user : Bank.getUser()){
+        if(user.getAccountNumber().equals(accountNumber)){
+            System.out.println( " Your account balance is " + user.getBalance());
+            found = true ;
+            break ;
+        }
+  else {
+            System.out.println(" please enter correct account number");
+            return ;
+  }
+    }
+
+}
+
+public static void withdrawAccountNumber(String accountNumber , Scanner scanner , Bank bank){
+    boolean found = false ;
+  for (User user  : Bank.getUser()){
+    if(user.getAccountNumber().equals(accountNumber)){
+        System.out.println(("Enter the Amount to Withdraw"));
+        double withdrawAmount = Double.parseDouble(scanner.nextLine());
+        if(withdrawAmount > 0 && user.getBalance()>= withdrawAmount){
+            double balance = user.getBalance() - withdrawAmount ;
+            user.setBalance(balance);
+        System.out.println("successfully withdraw Amount  "  + withdrawAmount + "Avialable balance" + balance );
+        found = true ;        
+        break ;
+        
+        }else {
+            System.out.println("Insufficient balance or invalid amount.");
+             return ;
+        }
+       
+    }
+     else {
+            System.out.println(" please enter correct account number");
+            return ;
+        }
+    }
+
+  }
 
     public  static void depositMoney( String accountNumber ,Scanner scanner , Bank bank){
        
@@ -177,9 +231,6 @@ public class BankAccountSimulation {
         this.loanAmount = loanAmount; 
     }
 }
-
- 
-
 
 
  
