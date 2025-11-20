@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java .util.*;
 public class BankAccountSimulation {
     public static void showMenu(){
@@ -12,7 +13,8 @@ public class BankAccountSimulation {
 
  public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
-     Bank  bank = new Bank("PNB Bank", new ArrayList<>());
+     Bank  bank = new Bank ("PNB Bank");
+
         System.out.println("Welcome to " + bank.getBankName());
 
 
@@ -24,32 +26,30 @@ public class BankAccountSimulation {
             switch (choice) {
                 case 1:
                     System.out.print(" Creating Account");
-                    System.out.println("Enter your first name: ");
-                    String firstName = scanner.nextLine();
-                    System.out.print(" Enter your last name: ");
-                    String lastName = scanner.nextLine();
-                     System.out.print(" Choose Account type saving or current");               
-                    String accountType = scanner.nextLine();                 
-                    System.out.print(" Enter initial deposit amount: ");
-                    double initialDeposit = Double.parseDouble(scanner.nextLine());
-                    CreateAccount(firstName, lastName,accountType, initialDeposit,0.0);
+                    CreateAccount(bank ,scanner);
                     continue ;
 
                     case   2 : 
                     System.out.print(" Deposit Money");
                     System.out.print(" Enter Account Number: ");
                     String depositerAccountNumber = scanner.nextLine();
-                    depositMoney(depositerAccountNumber);
-                    continue;
+                    depositMoney(depositerAccountNumber , scanner , bank);
+                    break ;
                     case 6 :
                     System.out.println(" List of all users:");
-                    for(User user : Bank.getUser()){
-                        System.out.println("Account Number: " + user.getAccountNumber() + ", Name: " + user.getFirstName() + " " + user.getlastName() + ", Balance: " + user.getBalance());
-                        continue;
+                    ArrayList<User> users = Bank.getUser();
+                    if (users.isEmpty()) {
+                        System.out.println("No users found." );
+                        
                     }
+                    for(User user : users){
+                        System.out.println("Account Number: " + user.getAccountNumber() + ", Name: " + user.getFirstName() + " " + user.getlastName() + ", Balance: " + user.getBalance());
+                       
+                    }
+                      break ;
                     case 7 :
-                        System.out.println("Thanks for coming bank");
-                         return ;
+                        System.out.println("Thanks for coming ");
+                        break;
                          default :
                            System.out.println( "unknown errror occured");
                            break ;
@@ -61,21 +61,24 @@ public class BankAccountSimulation {
 
  }   
 
-    public  static void depositMoney( String accountNumber){
-        System.out.println(" Depositing money to account number: " + accountNumber);
+    public  static void depositMoney( String accountNumber ,Scanner scanner , Bank bank){
+       
 
-         try {
+         
+             boolean found  = false ;
             for(User user : Bank.getUser()){
                 if(user.getAccountNumber().equals(accountNumber)){
                     System.out.println("Enter deposite Money");
-                    double depositAmount =  Double.parseDouble((new Scanner(System.in).nextLine()));
-                    double balance  =  user.getBalance() + depositAmount;
-                    if(balance > 0){
+                    double depositAmount =  Double.parseDouble(scanner.nextLine());
+                  
+                    if(depositAmount > 0){
+                          double balance  =  user.getBalance() + depositAmount;
                               user.setBalance(balance);
-                        System.out.println("Amount deposited - >" + balance);
-                       
+                        System.out.println("Amount deposited " + balance);
+                        found  = true  ;
+                        break;
                     } else{
-                        System.out.println("enter correct account  number");
+                        System.out.println(" please enter correct account number");
                         return ;
                     }
               
@@ -83,28 +86,34 @@ public class BankAccountSimulation {
                 }
 
 
-             }
-        } catch (Exception e) {
-            System.out.println(" An error occurred while depositing money: " + e.getMessage());
-           
-        }
+             
+        } 
     }
 
 
 
 
 
- public static void CreateAccount(String firstName, String lastName,String accountType, double initialDeposit,double loanAmount){
+ public static void CreateAccount(Bank bank , Scanner scanner){
+     System.out.println("Enter your first name: ");
+                    String firstName = scanner.nextLine();
+                    System.out.print(" Enter your last name: ");
+                    String lastName = scanner.nextLine();
+                     System.out.print(" Choose Account type saving or current");               
+                    String accountType = scanner.nextLine();                 
+                    System.out.print(" Enter initial deposit amount: ");
+                    double initialDeposit = Double.parseDouble(scanner.nextLine());
+
+
     String uudiDigit = UUID.randomUUID().toString().replaceAll("[^0-9]", "");
 
     String accountNumber = uudiDigit.substring(0, 12);   
 
-    User newUser = new User(firstName, lastName, accountNumber, accountType, initialDeposit,loanAmount);
+    User newUser = new User(firstName, lastName, accountNumber, accountType, initialDeposit,0.0);
+    
+    System.out.println("Account Number: " + newUser.getAccountNumber() + "Account Holder: " + newUser.getFirstName() + "Account Type: " + newUser.getAccountType()  + "Balance: " + newUser.getBalance()  );
+    bank.addUser(newUser);
     System.out.println("Account created successfully!");
-    System.out.println("Account Number: " + newUser.getAccountNumber());
-    System.out.println("Account Holder: " + newUser.getFirstName() + " " + newUser.getlastName());
-    System.out.println("Account Type: " + newUser.getAccountType());
-    System.out.println("Balance: " + newUser.getBalance());
  }
 
 }
@@ -159,15 +168,17 @@ public class BankAccountSimulation {
     //     }
     // }
 
-    public void setBalance( double balance2){
-        this.balance = balance2 ;
+   public void setBalance(double balance) {
+        this.balance = balance;
     }
 
-     public void setloanAmount(double loanAmount){
-  this.setloanAmount(loanAmount);
- }
+    public void setLoanAmount(double loanAmount) {
+        // FIXED: Recursion error. Now assigns value correctly.
+        this.loanAmount = loanAmount; 
+    }
+}
 
- }
+ 
 
 
 
@@ -176,9 +187,9 @@ class Bank{
     private static String bankName ;
     private static  ArrayList<User> user = new ArrayList<>();
 
-    public Bank(String bankName, ArrayList<User> user){
+    public Bank(String bankName){
         this.bankName = bankName;
-        this.user = user;
+        this.user = new ArrayList<>();
     
 
     }
